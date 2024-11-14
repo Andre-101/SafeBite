@@ -1,6 +1,10 @@
 import 'package:animated_login/animated_login.dart';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+
 
 import '../viewmodels/login_functions.dart';
 import '../widgets/dialog_builders.dart';
@@ -43,15 +47,46 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<String?> _authOperation(Future<String?> func) async {
-    await _operation?.cancel();
-    _operation = CancelableOperation.fromFuture(func);
-    final String? res = await _operation?.valueOrCancellation();
-    if (_operation?.isCompleted == true) {
-      DialogBuilder(context).showResultDialog(res ?? 'Successful.');
+  await _operation?.cancel();
+  _operation = CancelableOperation.fromFuture(func);
+  // Ignoramos el resultado y redireccionamos siempre al Home.
+  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+  return null;
+}
+
+  Future<String?> _signInWithGoogle() async {
+  try {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+    if (googleUser != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('username', googleUser.displayName ?? 'Usuario');
+
+      // Redireccionar a Home
       Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      return 'Successfully logged in with Google.';
+    } else {
+      return 'Login cancelled by user.';
     }
-    return res;
+  } catch (error) {
+    return 'Error during Google Sign-In: $error';
   }
+}
+
+  Future<String?> _signInWithFacebook() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', 'FacebookUser');
+
+    // Redireccionar a Home
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    return 'Successfully logged in with Facebook.';
+  } catch (error) {
+    return 'Error during Facebook Sign-In: $error';
+  }
+}
+
 
   LoginViewTheme get _desktopTheme => _mobileTheme.copyWith(
     // To set the color of button text, use foreground color.
@@ -109,11 +144,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   List<SocialLogin> _socialLogins(BuildContext context) => <SocialLogin>[
     SocialLogin(
-        callback: () async => _socialCallback('Google'),
-        iconPath: 'assets/images/google.png'),
+        callback: () async => await _signInWithGoogle(),
+        iconPath: 'assets/images/google.png',),
     SocialLogin(
-        callback: () async => _socialCallback('Facebook'),
-        iconPath: 'assets/images/facebook.png'),
+        callback: () async => await _signInWithFacebook(),
+        iconPath: 'assets/images/facebook.png',),
   ];
 
   Future<String?> _socialCallback(String type) async {
