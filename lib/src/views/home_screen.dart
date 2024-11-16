@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'profile_screen.dart';
+import 'scanner_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -85,57 +86,66 @@ Widget build(BuildContext context) {
         ),
       ],
     ),
-    body: Column(
-      children: [
-        const SizedBox(height: 20),
-        // Mensaje de bienvenida centrado
-        Text(
-          'Bienvenido/a $userName, ¿qué vamos a comer hoy?',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
+    body: Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/background-home.png'),
+          fit: BoxFit.cover,
         ),
-        const Spacer(),
-
-         // Barras de progreso para calorías, azúcar y sodio
-          _buildProgressBar("Calorías por día", dailyCalories, 2000), // Máximo 2000 calorías
-          _buildProgressBar("Azúcar por día", dailySugar, 50), // Máximo 50g de azúcar
-          _buildProgressBar("Sodio por día", dailySodium, 2300), // Máximo 2300mg de sodio
-
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          // Mensaje de bienvenida centrado
+          Text(
+            'Bienvenido/a $userName, ¿qué vamos a comer hoy?',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
           const Spacer(),
 
-        // Resultado del escáner
-        Text(
-          'Barcode Result: $result',
-          style: const TextStyle(fontSize: 18),
-        ),
-        const SizedBox(height: 20),
-        // Ícono de cámara centrado en el borde inferior
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: IconButton(
-            icon: const Icon(Icons.camera_alt, size: 50),
-            onPressed: () async {
-              var res = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SimpleBarcodeScannerPage(),
-                ),
-              );
-              setState(() {
-                  if (res is String) {
-                    result = res;
-                    // Aquí deberías analizar el código de barras y actualizar las barras
-                    _updateDailyProgress(500, 25, 1500); // Ejemplo de valores al escanear
-                  }
-                });
-            },
+           // Barras de progreso para calorías, azúcar y sodio
+            _buildProgressBar("Calorías por día", dailyCalories, 2000), // Máximo 2000 calorías
+            _buildProgressBar("Azúcar por día", dailySugar, 50), // Máximo 50g de azúcar
+            _buildProgressBar("Sodio por día", dailySodium, 2300), // Máximo 2300mg de sodio
+
+            const Spacer(),
+
+          // Resultado del escáner
+          Text(
+            'Barcode Result: $result',
+            style: const TextStyle(fontSize: 18),
           ),
-        ),
-        const SizedBox(height: 20),
-      ],
+          const SizedBox(height: 20),
+          // Ícono de cámara centrado en el borde inferior
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: IconButton(
+              icon: const Icon(Icons.camera_alt, size: 50),
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ScannerScreen(),
+                  ),
+                );
+                
+                if (result != null && result is Map<String, double>) {
+                  _updateDailyProgress(
+                    result['calories'] ?? 0,
+                    result['sugar'] ?? 0,
+                    result['sodium'] ?? 0,
+                  );
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
     ),
   );
 }
@@ -154,7 +164,7 @@ Widget build(BuildContext context) {
             value: currentValue / maxValue,
             minHeight: 10,
             backgroundColor: Colors.grey[300],
-            color: Colors.blue,
+            color: Colors.lightGreenAccent[400],
           ),
         ),
         const SizedBox(height: 10),
