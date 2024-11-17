@@ -1,0 +1,63 @@
+{
+  "_documentation": {
+    "note": "Solo los códigos de barras de Pepsi y Coca-Cola han sido verificados. Los demás códigos son ejemplos y deben ser reemplazados con los códigos reales de los productos.",
+    "last_updated": "2024-03-21",
+    "verified_products": ["Pepsi", "Coca-Cola"]
+  },
+  "products": [
+    {
+      "barcode": "7702192741749",
+      "name": "Pepsi",
+      "volume": "200 ml",
+      "calories": 39.0,
+      "sugar": 9.4,
+      "sodium": 7.2,
+      "image": "https://example.com/pepsi.jpg"
+    },
+    {
+      "barcode": "7702535011089",
+      "name": "Coca-Cola",
+      "volume": "400 ml",
+      "calories": 160.0,
+      "sugar": 164.0,
+      "sodium": 140.0,
+      "image": "https://example.com/cocacola.jpg"
+    },
+    {
+      "barcode": "PENDIENTE",
+      "name": "Saltín Noel",
+      "portion": "5 galletas",
+      "calories": 130.0,
+      "sugar": 0.0,
+      "sodium": 370.0,
+      "image": "https://example.com/saltin.jpg"
+    },
+    {
+      "barcode": "PENDIENTE",
+      "name": "Chocolatina Jet",
+      "weight": "11 g",
+      "calories": 63.0,
+      "sugar": 5.8,
+      "sodium": 10.0,
+      "image": "https://example.com/jet.jpg"
+    },
+    {
+      "barcode": "PENDIENTE",
+      "name": "Chocoramo",
+      "weight": "100 g",
+      "calories": 444.0,
+      "sugar": 32.0,
+      "sodium": 150.0,
+      "image": "https://example.com/chocoramo.jpg"
+    },
+    {
+      "barcode": "PENDIENTE",
+      "name": "Leche Alpina",
+      "volume": "240 ml",
+      "calories": 140.0,
+      "sugar": 11.0,
+      "sodium": 375.0,
+      "image": "https://example.com/alpina.jpg"
+    }
+  ]
+}

@@ -79,6 +79,7 @@ flutter:
     - assets/images/
     - assets/images/Perfil_placeholder.jpg
     - assets/images/background-home.png
+    - assets/colombian_database.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

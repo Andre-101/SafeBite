@@ -65,6 +65,21 @@ Future<void> _loadDailyProgress() async {
     prefs.setDouble('dailySodium', sodium);
   }
 
+  // Añadir esta nueva función para reiniciar los valores
+  Future<void> _resetDailyProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      dailyCalories = 0;
+      dailySugar = 0;
+      dailySodium = 0;
+    });
+
+    // Limpiar los valores en SharedPreferences
+    await prefs.setDouble('dailyCalories', 0);
+    await prefs.setDouble('dailySugar', 0);
+    await prefs.setDouble('dailySodium', 0);
+  }
+
   @override
 Widget build(BuildContext context) {
   return Scaffold(
@@ -72,7 +87,38 @@ Widget build(BuildContext context) {
       title: const Text('Inicio'),
       centerTitle: true,
       actions: [
-        // Foto de perfil en la esquina superior derecha
+        // Botón de reinicio
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
+            // Mostrar diálogo de confirmación
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Reiniciar Datos'),
+                  content: const Text('¿Estás seguro de que quieres reiniciar todos los valores a cero?'),
+                  actions: [
+                    TextButton(
+                      child: const Text('Cancelar'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('Reiniciar'),
+                      onPressed: () {
+                        _resetDailyProgress();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+        // Foto de perfil existente
         IconButton(
           icon: CircleAvatar(
             backgroundImage: AssetImage('assets/images/Perfil_placeholder.jpg'),
@@ -133,11 +179,11 @@ Widget build(BuildContext context) {
                   ),
                 );
                 
-                if (result != null && result is Map<String, double>) {
-                  _updateDailyProgress(
-                    result['calories'] ?? 0,
-                    result['sugar'] ?? 0,
-                    result['sodium'] ?? 0,
+                if (result != null && result is Map<String, dynamic>) {
+                  await _updateDailyProgress(
+                    dailyCalories + (result['calories'] ?? 0),
+                    dailySugar + (result['sugar'] ?? 0),
+                    dailySodium + (result['sodium'] ?? 0),
                   );
                 }
               },

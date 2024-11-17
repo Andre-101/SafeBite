@@ -3,6 +3,8 @@ import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/services.dart';
+
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -16,12 +18,42 @@ class _ScannerScreenState extends State<ScannerScreen> {
   final ImagePicker _picker = ImagePicker();
   String _scanResult = '';
 
+  Future<Map<String, dynamic>?> _searchInLocalJson(String barcode) async {
+    try {
+      final String jsonString = await rootBundle.loadString('assets/colombian_database.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      final List<dynamic> products = jsonData['products'];
+
+      final product = products.firstWhere(
+        (item) => item['barcode'] == barcode && item['barcode'] != 'PENDIENTE',
+        orElse: () => null,
+      );
+
+      if (product != null) {
+        return {
+          'calories': double.parse(product['calories'].toString()),
+          'sugar': double.parse(product['sugar'].toString()),
+          'sodium': double.parse(product['sodium'].toString()),
+          'name': product['name'],
+          'image': product['image'],
+          'origen': 'Local (Colombia)'
+        };
+      }
+    } catch (e) {
+      print('Error al buscar en JSON local: $e');
+    }
+    return null;
+  }
+
   Future<Map<String, dynamic>?> _getProductInfo(String barcode) async {
-    // Primero intentamos con nuestra API colombiana
+    // Primero buscamos en el JSON local
+    final localProduct = await _searchInLocalJson(barcode);
+    if (localProduct != null) return localProduct;
+
+    // Luego intentamos con tu API colombiana
     try {
       final colombianResponse = await http.get(
         Uri.parse('https://tu-api-colombiana.com/api/products/$barcode')
-        // Reemplaza la URL con tu endpoint real
       );
 
       if (colombianResponse.statusCode == 200) {
@@ -32,11 +64,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
           'sodium': data['sodio']?.toDouble() ?? 0.0,
           'name': data['nombre'],
           'image': data['imagen_url'],
-          'origen': 'Colombia'
+          'origen': 'Colombia (API)'
         };
       }
+    } catch (e) {
+      print('Error al consultar API colombiana: $e');
+    }
 
-      // Si no se encuentra en la base colombiana, intentamos con OpenFoodFacts
+    // Si no se encuentra, buscamos en OpenFoodFacts
+    try {
       final openFoodResponse = await http.get(
         Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json')
       );
@@ -53,15 +89,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
             'sodium': nutriments['sodium_100g']?.toDouble() ?? 0.0,
             'name': product['product_name'],
             'image': product['image_url'],
-            'origen': 'Internacional'
+            'origen': 'Internacional (OpenFoodFacts)'
           };
         }
       }
-      return null;
     } catch (e) {
-      print('Error obteniendo información del producto: $e');
-      return null;
+      print('Error al consultar OpenFoodFacts: $e');
     }
+
+    // Si no se encuentra en ninguna fuente, devolvemos null
+    return null;
   }
 
   Future<void> _processBarcode(String barcode) async {
@@ -75,7 +112,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
       setState(() {
         result = 'Producto encontrado: ${productInfo['name']}';
       });
-      Navigator.pop(context, productInfo);
+      Navigator.pop(context, {
+        'calories': productInfo['calories'],
+        'sugar': productInfo['sugar'],
+        'sodium': productInfo['sodium']
+      });
     } else {
       setState(() {
         result = 'No se encontró información del producto';
