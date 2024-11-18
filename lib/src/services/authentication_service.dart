@@ -42,6 +42,13 @@ class AuthenticationService {
           email: email,
           password: password
       );
+
+      UserModel.initialize(
+          uid: credential.user!.uid,
+          email: credential.user!.email!,
+          name: credential.user!.displayName!
+      );
+
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         return 'No user found for that email.';
