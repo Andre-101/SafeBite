@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user_model.dart';
@@ -22,6 +23,10 @@ class AuthenticationService {
           email: credential.user!.email!,
           name: credential.user!.displayName!
       );
+
+      if (kDebugMode) {
+        print("Username:${UserModel.instance.name}");
+      }
 
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

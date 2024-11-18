@@ -30,8 +30,10 @@ class LoginFunctions {
   }
 
   Future<String?> socialLogin(String type) async {
+    return 'Function no available';
+    /*
     await Future.delayed(const Duration(seconds: 2));
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-    return null;
+    return null; */
   }
 }

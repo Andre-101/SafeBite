@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'profile_screen.dart';
 import 'scanner_screen.dart';
