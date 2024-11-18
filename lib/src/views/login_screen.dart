@@ -48,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final String? res = await _operation?.valueOrCancellation();
     if (_operation?.isCompleted == true) {
       DialogBuilder(context).showResultDialog(res ?? 'Successful.');
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
     }
     return res;
   }
