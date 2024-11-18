@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class ScannerScreen extends StatefulWidget {
@@ -18,60 +19,36 @@ class _ScannerScreenState extends State<ScannerScreen> {
   final ImagePicker _picker = ImagePicker();
   String _scanResult = '';
 
-  Future<Map<String, dynamic>?> _searchInLocalJson(String barcode) async {
+  Future<Map<String, dynamic>?> _searchInFirestore(String barcode) async {
     try {
-      final String jsonString = await rootBundle.loadString('assets/colombian_database.json');
-      final Map<String, dynamic> jsonData = json.decode(jsonString);
-      final List<dynamic> products = jsonData['products'];
+      final DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('products')
+          .doc(barcode)
+          .get();
 
-      final product = products.firstWhere(
-        (item) => item['barcode'] == barcode && item['barcode'] != 'PENDIENTE',
-        orElse: () => null,
-      );
-
-      if (product != null) {
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
         return {
-          'calories': double.parse(product['calories'].toString()),
-          'sugar': double.parse(product['sugar'].toString()),
-          'sodium': double.parse(product['sodium'].toString()),
-          'name': product['name'],
-          'image': product['image'],
-          'origen': 'Local (Colombia)'
+          'calories': double.parse(data['calories'].toString()),
+          'sugar': double.parse(data['sugar'].toString()),
+          'sodium': double.parse(data['sodium'].toString()),
+          'name': data['name'],
+          'image': data['image'],
+          'origen': 'Firebase (Colombia)'
         };
       }
     } catch (e) {
-      print('Error al buscar en JSON local: $e');
+      print('Error al buscar en Firestore: $e');
     }
     return null;
   }
 
   Future<Map<String, dynamic>?> _getProductInfo(String barcode) async {
-    // Primero buscamos en el JSON local
-    final localProduct = await _searchInLocalJson(barcode);
-    if (localProduct != null) return localProduct;
+    // Primero buscamos en Firestore en lugar del JSON local
+    final firestoreProduct = await _searchInFirestore(barcode);
+    if (firestoreProduct != null) return firestoreProduct;
 
-    // Luego intentamos con tu API colombiana
-    try {
-      final colombianResponse = await http.get(
-        Uri.parse('https://tu-api-colombiana.com/api/products/$barcode')
-      );
 
-      if (colombianResponse.statusCode == 200) {
-        final data = json.decode(colombianResponse.body);
-        return {
-          'calories': data['calorias']?.toDouble() ?? 0.0,
-          'sugar': data['azucares']?.toDouble() ?? 0.0,
-          'sodium': data['sodio']?.toDouble() ?? 0.0,
-          'name': data['nombre'],
-          'image': data['imagen_url'],
-          'origen': 'Colombia (API)'
-        };
-      }
-    } catch (e) {
-      print('Error al consultar API colombiana: $e');
-    }
-
-    // Si no se encuentra, buscamos en OpenFoodFacts
     try {
       final openFoodResponse = await http.get(
         Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json')
@@ -189,6 +166,47 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   label: const Text('Abrir Galería'),
                 ),
               ],
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  // Carga el archivo JSON
+                  final String jsonString = await rootBundle.loadString('assets/images/colombian_database.json');
+                  final Map<String, dynamic> jsonData = json.decode(jsonString);
+                  
+                  int uploadedCount = 0;
+                  
+                  // Sube cada producto
+                  for (var product in jsonData['products']) {
+                    if (product['barcode'] != 'PENDIENTE') {
+                      await FirebaseFirestore.instance
+                          .collection('products')
+                          .doc(product['barcode'])
+                          .set({
+                        'name': product['name'],
+                        'volume': product['volume'],
+                        'calories': product['calories'],
+                        'sugar': product['sugar'],
+                        'sodium': product['sodium'],
+                        'image': product['image'],
+                      });
+                      uploadedCount++;
+                      print('Subido producto: ${product['name']}');
+                    }
+                  }
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Subidos $uploadedCount productos a Firestore')),
+                  );
+                  
+                } catch (e) {
+                  print('Error al subir productos: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Error al subir productos a Firestore')),
+                  );
+                }
+              },
+              child: const Text('Subir Base de Datos Colombia'),
             ),
           ],
         ),

@@ -1,0 +1,9 @@
+name: firebase_upload_script
+description: Script to upload data to Firebase
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  firebase_admin: ^0.2.0
+  path: ^1.8.0 

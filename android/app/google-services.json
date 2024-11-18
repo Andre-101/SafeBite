@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1004401762155",
+    "project_id": "safebite-f5e89",
+    "storage_bucket": "safebite-f5e89.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1004401762155:android:d34d4537da7d9cb75cf62e",
+        "android_client_info": {
+          "package_name": "com.skstudio.safe_bite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1004401762155-0e9t4ckmkjm3u773n9ri2785o1vrkmiq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGNVnnoKOXvki2GE7WwvH8AUBqwl6svb4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1004401762155-0e9t4ckmkjm3u773n9ri2785o1vrkmiq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

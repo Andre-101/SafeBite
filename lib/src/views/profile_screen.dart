@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'change_diet.dart';
-import 'change_health.dart';
-import 'change_settings.dart';
+
+import '../viewmodels/change_diet.dart';
+import '../viewmodels/change_health.dart';
+import '../viewmodels/change_settings.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
