@@ -23,11 +23,28 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
+<<<<<<< HEAD
         return ios;
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
         return windows;
+=======
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
+      case TargetPlatform.macOS:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
+      case TargetPlatform.windows:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
+>>>>>>> isaac
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -40,6 +57,7 @@ class DefaultFirebaseOptions {
     }
   }
 
+<<<<<<< HEAD
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyBuU5lR6dtzT_uJgDArxOgKtOFdX7B-piU',
     appId: '1:1004401762155:web:fbf892fbd0c479445cf62e',
@@ -53,11 +71,17 @@ class DefaultFirebaseOptions {
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDGNVnnoKOXvki2GE7WwvH8AUBqwl6svb4',
     appId: '1:1004401762155:android:8eeda5c72a68afe75cf62e',
+=======
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyDGNVnnoKOXvki2GE7WwvH8AUBqwl6svb4',
+    appId: '1:1004401762155:android:d34d4537da7d9cb75cf62e',
+>>>>>>> isaac
     messagingSenderId: '1004401762155',
     projectId: 'safebite-f5e89',
     storageBucket: 'safebite-f5e89.firebasestorage.app',
   );
 
+<<<<<<< HEAD
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyC5hbLNjtw70g0W6PZKyxlO9W1Z9Vvbjas',
     appId: '1:1004401762155:ios:e64981f70735c1595cf62e',
@@ -86,5 +110,15 @@ class DefaultFirebaseOptions {
     authDomain: 'safebite-f5e89.firebaseapp.com',
     storageBucket: 'safebite-f5e89.firebasestorage.app',
     measurementId: 'G-NQ61JYWG8J',
+=======
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: "AIzaSyBuU5lR6dtzT_uJgDArxOgKtOFdX7B-piU",
+    authDomain: "safebite-f5e89.firebaseapp.com",
+    projectId: "safebite-f5e89",
+    storageBucket: "safebite-f5e89.firebasestorage.app",
+    messagingSenderId: "1004401762155",
+    appId: "1:1004401762155:web:fbf892fbd0c479445cf62e",
+    measurementId: "G-Y5WZQJYRDB"
+>>>>>>> isaac
   );
 }

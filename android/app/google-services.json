@@ -33,6 +33,7 @@
           ]
         }
       }
+<<<<<<< HEAD
     },
     {
       "client_info": {
@@ -62,6 +63,8 @@
           ]
         }
       }
+=======
+>>>>>>> isaac
     }
   ],
   "configuration_version": "1"

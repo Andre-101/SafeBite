@@ -32,8 +32,31 @@ class _LoginScreenState extends State<LoginScreen> {
       loginDesktopTheme: _desktopTheme,
       loginMobileTheme: _mobileTheme,
       loginTexts: _loginTexts,
+<<<<<<< HEAD
       emailValidator: ValidatorModel(
           validatorCallback: (String? email) => 'What an email! $email'),
+=======
+      passwordValidator: ValidatorModel(
+        validatorCallback: (String? password) {
+          if (password == null || password.isEmpty) {
+            return 'La contraseña es requerida';
+          }
+          if (password.length < 8) {
+            return 'La contraseña debe tener al menos 8 caracteres';
+          }
+          if (!password.contains(RegExp(r'[A-Z]'))) {
+            return 'La contraseña debe contener al menos una mayúscula';
+          }
+          if (!password.contains(RegExp(r'[a-z]'))) {
+            return 'La contraseña debe contener al menos una minúscula';
+          }
+          if (!password.contains(RegExp(r'[0-9]'))) {
+            return 'La contraseña debe contener al menos un número';
+          }
+          return '';
+        },
+      ),
+>>>>>>> isaac
       initialMode: currentMode,
       onAuthModeChange: (AuthMode newMode) async {
         currentMode = newMode;
@@ -42,6 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+<<<<<<< HEAD
   Future<String?> _authOperation(Future<String?> func) async {
     await _operation?.cancel();
     _operation = CancelableOperation.fromFuture(func);
@@ -50,6 +74,27 @@ class _LoginScreenState extends State<LoginScreen> {
       DialogBuilder(context).showResultDialog(res ?? 'Successful.');
     }
     return res;
+=======
+ Future<String?> _authOperation(Future<String?> func) async {
+  await _operation?.cancel();
+  _operation = CancelableOperation.fromFuture(func);
+
+  try {
+    final String? res = await _operation?.valueOrCancellation();
+
+    if (_operation?.isCompleted == true) {
+      if (res == null || res.isEmpty) {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      } else {
+        DialogBuilder(context).showResultDialog(res);
+      }
+    }
+    return res;
+  } catch (e) {
+    DialogBuilder(context).showResultDialog('Error inesperado: $e');
+    return 'Error inesperado: $e';
+  }
+>>>>>>> isaac
   }
 
   LoginViewTheme get _desktopTheme => _mobileTheme.copyWith(
@@ -120,10 +165,13 @@ class _LoginScreenState extends State<LoginScreen> {
     _operation = CancelableOperation.fromFuture(
         LoginFunctions(context).socialLogin(type));
     final String? res = await _operation?.valueOrCancellation();
+<<<<<<< HEAD
     if (res != null) {
       DialogBuilder(context)
           .showResultDialog(res);
     }
+=======
+>>>>>>> isaac
     if (_operation?.isCompleted == true && res == null) {
       DialogBuilder(context)
           .showResultDialog('Successfully logged in with $type.');

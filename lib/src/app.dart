@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 
 import 'views/home_screen.dart';
 import 'views/login_screen.dart';
+=======
+import 'package:safe_bite/src/views/home_screen.dart';
+import 'package:safe_bite/src/views/login_screen.dart';
+>>>>>>> isaac
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -17,7 +22,11 @@ class App extends StatelessWidget {
         textTheme: Theme.of(context).textTheme.apply(
           // Note: The below line is required due to a current bug in Flutter:
           // https://github.com/flutter/flutter/issues/129553
+<<<<<<< HEAD
             decorationColor: Colors.blue),
+=======
+          decorationColor: Colors.blue),
+>>>>>>> isaac
         inputDecorationTheme: const InputDecorationTheme(
           prefixIconColor: Colors.black54,
           suffixIconColor: Colors.black54,

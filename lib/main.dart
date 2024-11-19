@@ -7,7 +7,11 @@ import 'src/app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+<<<<<<< HEAD
       options: DefaultFirebaseOptions.currentPlatform
+=======
+    options: DefaultFirebaseOptions.currentPlatform
+>>>>>>> isaac
   );
   runApp(const App());
 }

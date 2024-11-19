@@ -1,7 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<<<<<<< HEAD
     package="com.skstudio.safebite">
     <application
         android:label="safebite"
+=======
+    android:versionCode="TODO" package="com.skstudio.safe_bite">
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <application
+        android:label="safe_bite"
+>>>>>>> isaac
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

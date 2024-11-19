@@ -170,6 +170,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
+<<<<<<< HEAD
                   // Carga el archivo JSON
                   final String jsonString = await rootBundle.loadString('assets/images/colombian_database.json');
                   final Map<String, dynamic> jsonData = json.decode(jsonString);
@@ -192,6 +193,46 @@ class _ScannerScreenState extends State<ScannerScreen> {
                       });
                       uploadedCount++;
                       print('Subido producto: ${product['name']}');
+=======
+                  // Agregar log para verificar si está entrando a la función
+                  print('Iniciando carga de base de datos...');
+                  
+                  // Verificar que el archivo existe y se puede cargar
+                  final String jsonString = await rootBundle.loadString('assets/colombian_database.json');
+                  print('JSON cargado exitosamente');
+                  
+                  final Map<String, dynamic> jsonData = json.decode(jsonString);
+                  print('JSON decodificado. Productos encontrados: ${jsonData['products']?.length ?? 0}');
+                  
+                  int uploadedCount = 0;
+                  
+                  // Verificar la estructura del JSON antes de procesar
+                  if (jsonData['products'] == null || !(jsonData['products'] is List)) {
+                    throw Exception('Estructura de JSON inválida');
+                  }
+                  
+                  // Sube cada producto
+                  for (var product in jsonData['products']) {
+                    try {
+                      if (product['barcode'] != 'PENDIENTE') {
+                        print('Intentando subir producto: ${product['barcode']}');
+                        await FirebaseFirestore.instance
+                            .collection('products')
+                            .doc(product['barcode'])
+                            .set({
+                          'name': product['name'],
+                          'volume': product['volume'],
+                          'calories': product['calories'],
+                          'sugar': product['sugar'],
+                          'sodium': product['sodium'],
+                          'image': product['image'],
+                        });
+                        uploadedCount++;
+                        print('Producto subido exitosamente: ${product['name']}');
+                      }
+                    } catch (e) {
+                      print('Error al subir producto individual: ${product['barcode']} - Error: $e');
+>>>>>>> isaac
                     }
                   }
                   
