@@ -48,10 +48,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
     // Primero buscamos en Firestore en lugar del JSON local
     final firestoreProduct = await _searchInFirestore(barcode);
     if (firestoreProduct != null) return firestoreProduct;
-    
+
     try {
       final openFoodResponse = await http.get(
-        Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json')
+          Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json')
       );
 
       if (openFoodResponse.statusCode == 200) {
@@ -59,7 +59,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
         if (data['status'] == 1) {
           final product = data['product'];
           final nutriments = product['nutriments'];
-          
+
           return {
             'calories': nutriments['energy-kcal_100g']?.toDouble() ?? 0.0,
             'sugar': nutriments['sugars_100g']?.toDouble() ?? 0.0,
@@ -84,7 +84,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     });
 
     final productInfo = await _getProductInfo(barcode);
-    
+
     if (productInfo != null) {
       setState(() {
         result = 'Producto encontrado: ${productInfo['name']}';
@@ -170,35 +170,51 @@ class _ScannerScreenState extends State<ScannerScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  // Carga el archivo JSON
-                  final String jsonString = await rootBundle.loadString('assets/images/colombian_database.json');
+                  // Agregar log para verificar si está entrando a la función
+                  print('Iniciando carga de base de datos...');
+
+                  // Verificar que el archivo existe y se puede cargar
+                  final String jsonString = await rootBundle.loadString('assets/colombian_database.json');
+                  print('JSON cargado exitosamente');
+
                   final Map<String, dynamic> jsonData = json.decode(jsonString);
-                  
+                  print('JSON decodificado. Productos encontrados: ${jsonData['products']?.length ?? 0}');
+
                   int uploadedCount = 0;
-                  
+
+                  // Verificar la estructura del JSON antes de procesar
+                  if (jsonData['products'] == null || !(jsonData['products'] is List)) {
+                    throw Exception('Estructura de JSON inválida');
+                  }
+
                   // Sube cada producto
                   for (var product in jsonData['products']) {
-                    if (product['barcode'] != 'PENDIENTE') {
-                      await FirebaseFirestore.instance
-                          .collection('products')
-                          .doc(product['barcode'])
-                          .set({
-                        'name': product['name'],
-                        'volume': product['volume'],
-                        'calories': product['calories'],
-                        'sugar': product['sugar'],
-                        'sodium': product['sodium'],
-                        'image': product['image'],
-                      });
-                      uploadedCount++;
-                      print('Subido producto: ${product['name']}');
+                    try {
+                      if (product['barcode'] != 'PENDIENTE') {
+                        print('Intentando subir producto: ${product['barcode']}');
+                        await FirebaseFirestore.instance
+                            .collection('products')
+                            .doc(product['barcode'])
+                            .set({
+                          'name': product['name'],
+                          'volume': product['volume'],
+                          'calories': product['calories'],
+                          'sugar': product['sugar'],
+                          'sodium': product['sodium'],
+                          'image': product['image'],
+                        });
+                        uploadedCount++;
+                        print('Producto subido exitosamente: ${product['name']}');
+                      }
+                    } catch (e) {
+                      print('Error al subir producto individual: ${product['barcode']} - Error: $e');
                     }
                   }
-                  
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Subidos $uploadedCount productos a Firestore')),
                   );
-                  
+
                 } catch (e) {
                   print('Error al subir productos: $e');
                   ScaffoldMessenger.of(context).showSnackBar(

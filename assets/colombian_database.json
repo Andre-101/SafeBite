@@ -24,6 +24,15 @@
       "image": "https://example.com/cocacola.jpg"
     },
     {
+      "barcode": "7702090066258",
+      "name": "TropiKola Manzana",
+      "weight": "400 ml",
+      "calories": 56.0,
+      "sugar": 13.2,
+      "sodium": 16.4,
+      "image": "https://example.com/tropikola.jpg"
+    },
+    {
       "barcode": "PENDIENTE",
       "name": "Saltín Noel",
       "portion": "5 galletas",

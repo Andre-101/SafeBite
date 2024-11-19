@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:safebite/src/views/profile_screen.dart';
+import 'package:safebite/src/views/scanner_screen.dart';
 
 import 'views/home_screen.dart';
 import 'views/login_screen.dart';
@@ -17,7 +19,7 @@ class App extends StatelessWidget {
         textTheme: Theme.of(context).textTheme.apply(
           // Note: The below line is required due to a current bug in Flutter:
           // https://github.com/flutter/flutter/issues/129553
-            decorationColor: Colors.blue),
+            decorationColor: Colors.green),
         inputDecorationTheme: const InputDecorationTheme(
           prefixIconColor: Colors.black54,
           suffixIconColor: Colors.black54,
@@ -34,8 +36,9 @@ class App extends StatelessWidget {
       routes: {
         '/login': (BuildContext context) => const LoginScreen(),
         '/home': (BuildContext context) => const HomeScreen(),
+        '/profile': (BuildContext context) => const ProfileScreen(),
+        '/scanner': (BuildContext context) => const ScannerScreen()
       },
-      //home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }

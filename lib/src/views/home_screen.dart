@@ -179,10 +179,44 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
 
                   if (result != null && result is Map<String, dynamic>) {
-                    await _updateDailyProgress(
-                      dailyCalories + (result['calories'] ?? 0),
-                      dailySugar + (result['sugar'] ?? 0),
-                      dailySodium + (result['sodium'] ?? 0),
+                    // Mostrar diálogo con información nutricional
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Información Nutricional'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.network(result['image'] ?? 'https://via.placeholder.com/150', height: 100),
+                              Text('Nombre: ${result['name'] ?? 'Desconocido'}'),
+                              Text('Calorías: ${result['calories'] ?? 0}'),
+                              Text('Azúcar: ${result['sugar'] ?? 0}'),
+                              Text('Sodio: ${result['sodium'] ?? 0}'),
+                              Text('Volumen: ${result['volume'] ?? 'Desconocido'}'),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              child: const Text('Entendido'),
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Cierra el diálogo
+                              },
+                            ),
+                            TextButton(
+                              child: const Text('Consumir'),
+                              onPressed: () async {
+                                await _updateDailyProgress(
+                                  dailyCalories + (result['calories'] ?? 0),
+                                  dailySugar + (result['sugar'] ?? 0),
+                                  dailySodium + (result['sodium'] ?? 0),
+                                );
+                                Navigator.of(context).pop(); // Cierra el diálogo
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     );
                   }
                 },
