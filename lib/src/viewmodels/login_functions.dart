@@ -42,6 +42,6 @@ class LoginFunctions {
     return 'Function no available';
     /*
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-    return null; */
+    */
   }
 }
