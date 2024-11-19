@@ -44,11 +44,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   Future<Map<String, dynamic>?> _getProductInfo(String barcode) async {
+
     // Primero buscamos en Firestore en lugar del JSON local
     final firestoreProduct = await _searchInFirestore(barcode);
     if (firestoreProduct != null) return firestoreProduct;
-
-
+    
     try {
       final openFoodResponse = await http.get(
         Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json')

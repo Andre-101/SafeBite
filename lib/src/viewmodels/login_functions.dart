@@ -21,6 +21,8 @@ class LoginFunctions {
   }
 
   Future<String?> socialLogin(String type) async {
+    return 'Function no available';
+    /*
     await Future.delayed(const Duration(seconds: 2));
     return null;
   }

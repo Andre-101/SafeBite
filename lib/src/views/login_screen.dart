@@ -152,8 +152,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_operation?.isCompleted == true && res == null) {
       DialogBuilder(context)
           .showResultDialog('Successfully logged in with $type.');
-
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
     }
     return res;
   }
