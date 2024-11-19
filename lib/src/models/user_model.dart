@@ -37,5 +37,9 @@ class UserModel {
       throw Exception("UserModel ya ha sido inicializado.");
     }
   }
+
+  static void clear() {
+    _instance = null;
+  }
 }
 

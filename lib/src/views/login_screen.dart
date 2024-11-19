@@ -32,8 +32,26 @@ class _LoginScreenState extends State<LoginScreen> {
       loginDesktopTheme: _desktopTheme,
       loginMobileTheme: _mobileTheme,
       loginTexts: _loginTexts,
-      emailValidator: ValidatorModel(
-          validatorCallback: (String? email) => 'What an email! $email'),
+      passwordValidator: ValidatorModel(
+        validatorCallback: (String? password) {
+          if (password == null || password.isEmpty) {
+            return 'La contraseña es requerida';
+          }
+          if (password.length < 8) {
+            return 'La contraseña debe tener al menos 8 caracteres';
+          }
+          if (!password.contains(RegExp(r'[A-Z]'))) {
+            return 'La contraseña debe contener al menos una mayúscula';
+          }
+          if (!password.contains(RegExp(r'[a-z]'))) {
+            return 'La contraseña debe contener al menos una minúscula';
+          }
+          if (!password.contains(RegExp(r'[0-9]'))) {
+            return 'La contraseña debe contener al menos un número';
+          }
+          return '';
+        },
+      ),
       initialMode: currentMode,
       onAuthModeChange: (AuthMode newMode) async {
         currentMode = newMode;
@@ -42,14 +60,25 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<String?> _authOperation(Future<String?> func) async {
-    await _operation?.cancel();
-    _operation = CancelableOperation.fromFuture(func);
+ Future<String?> _authOperation(Future<String?> func) async {
+  await _operation?.cancel();
+  _operation = CancelableOperation.fromFuture(func);
+
+  try {
     final String? res = await _operation?.valueOrCancellation();
+
     if (_operation?.isCompleted == true) {
-      DialogBuilder(context).showResultDialog(res ?? 'Successful.');
+      if (res == null || res.isEmpty) {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      } else {
+        DialogBuilder(context).showResultDialog(res);
+      }
     }
     return res;
+  } catch (e) {
+    DialogBuilder(context).showResultDialog('Error inesperado: $e');
+    return 'Error inesperado: $e';
+  }
   }
 
   LoginViewTheme get _desktopTheme => _mobileTheme.copyWith(

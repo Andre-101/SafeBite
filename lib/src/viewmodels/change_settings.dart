@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import '../services/authentication_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -16,36 +16,46 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título de la pantalla
             const Text(
               'Ajustes de cuenta',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
 
-            // Opción para cerrar sesión
             ListTile(
               title: const Text('Cerrar sesión'),
               trailing: const Icon(Icons.logout),
               onTap: () async {
-                // Cerrar sesión con Google
-                final GoogleSignIn googleSignIn = GoogleSignIn();
-                await googleSignIn.signOut();
-                
-                // Limpiar preferencias locales
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.remove('username');
-                // Redirigir al login
-                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                try {
+                  // Cerrar sesión
+                  await AuthenticationService(context).signOut();
+                  
+                  // Limpiar preferencias locales
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
+                  
+                  if (context.mounted) {
+                    // Redirigir al login
+                    Navigator.pushNamedAndRemoveUntil(
+                      context, 
+                      '/login', 
+                      (route) => false
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error al cerrar sesión: $e'))
+                    );
+                  }
+                }
               },
             ),
 
-            // Opción para eliminar cuenta
             ListTile(
               title: const Text('Eliminar cuenta'),
               trailing: const Icon(Icons.delete_forever),
-              onTap: () async {
-                // Confirmar eliminación de cuenta
+              onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -54,23 +64,21 @@ class SettingsScreen extends StatelessWidget {
                       content: const Text('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no puede deshacerse.'),
                       actions: <Widget>[
                         TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();  // Cerrar el diálogo sin eliminar la cuenta
-                          },
+                          onPressed: () => Navigator.of(context).pop(),
                           child: const Text('Cancelar'),
                         ),
                         TextButton(
                           onPressed: () async {
-                            // Lógica para eliminar la cuenta (puedes implementar esto según tu backend o necesidades)
-                            // En este ejemplo, solo eliminamos las preferencias locales
                             final prefs = await SharedPreferences.getInstance();
-                            await prefs.clear();  // Elimina todos los datos guardados
+                            await prefs.clear();
                             
-                            // Cerrar sesión y redirigir al login
-                            final GoogleSignIn googleSignIn = GoogleSignIn();
-                            await googleSignIn.signOut();
-                            
-                            Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                            if (context.mounted) {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context, 
+                                '/login', 
+                                (route) => false
+                              );
+                            }
                           },
                           child: const Text('Eliminar'),
                         ),
