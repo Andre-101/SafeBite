@@ -39,6 +39,9 @@ class LoginFunctions {
 
   Future<String?> socialLogin(String type) async {
     await Future.delayed(const Duration(seconds: 2));
+    if(type == 'Google'){
+      final res = AuthenticationService(context).signInWithGoogle();
+    }
     return 'Function no available';
     /*
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
