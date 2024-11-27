@@ -39,12 +39,19 @@ class LoginFunctions {
 
   Future<String?> socialLogin(String type) async {
     await Future.delayed(const Duration(seconds: 2));
+    var res;
     if(type == 'Google'){
-      final res = AuthenticationService(context).signInWithGoogle();
+      res =  await AuthenticationService(context).signInWithGoogle();
+    }else if(type == 'Facebook'){
+      res = await AuthenticationService(context).signInWithFacebook();
     }
-    return 'Function no available';
-    /*
+
+    if (res != null) {
+      return res;
+    }
+
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-    */
+
+    return null;
   }
 }
