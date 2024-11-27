@@ -37,5 +37,60 @@ class UserModel {
       throw Exception("UserModel ya ha sido inicializado.");
     }
   }
+
+  static void update({
+    required String uid,
+    required String email,
+    required String name,
+    String photoUrl = '',
+  }) {
+    _instance = UserModel._(
+      uid: uid,
+      email: email,
+      name: name,
+      photoUrl: photoUrl,
+    );
+  }
+
+  static void reset() {
+    _instance = null;
+  }
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel._(
+      uid: map['uid'] ?? '',
+      email: map['email'] ?? '',
+      name: map['name'] ?? '',
+      photoUrl: map['photoUrl'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uid': uid,
+      'email': email,
+      'name': name,
+      'photoUrl': photoUrl,
+    };
+  }
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel._(
+      uid: json['uid'] ?? '',
+      email: json['email'] ?? '',
+      name: json['name'] ?? '',
+      photoUrl: json['photoUrl'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'email': email,
+      'name': name,
+      'photoUrl': photoUrl,
+    };
+  }
 }
+
 

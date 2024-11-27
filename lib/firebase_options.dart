@@ -42,12 +42,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyBuU5lR6dtzT_uJgDArxOgKtOFdX7B-piU',
-    appId: '1:1004401762155:web:fbf892fbd0c479445cf62e',
+    appId: '1:1004401762155:web:8b3749116c6b99825cf62e',
     messagingSenderId: '1004401762155',
     projectId: 'safebite-f5e89',
     authDomain: 'safebite-f5e89.firebaseapp.com',
     storageBucket: 'safebite-f5e89.firebasestorage.app',
-    measurementId: 'G-Y5WZQJYRDB',
+    measurementId: 'G-NQ61JYWG8J',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1004401762155',
     projectId: 'safebite-f5e89',
     storageBucket: 'safebite-f5e89.firebasestorage.app',
+    androidClientId: '1004401762155-olnfv09rr0q09cnmbboqv55htk58894m.apps.googleusercontent.com',
     iosClientId: '1004401762155-sct89f2i4o5268nbpukg7l8f19m82nnu.apps.googleusercontent.com',
     iosBundleId: 'com.skstudio.safebite',
   );
@@ -74,6 +75,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1004401762155',
     projectId: 'safebite-f5e89',
     storageBucket: 'safebite-f5e89.firebasestorage.app',
+    androidClientId: '1004401762155-olnfv09rr0q09cnmbboqv55htk58894m.apps.googleusercontent.com',
     iosClientId: '1004401762155-sct89f2i4o5268nbpukg7l8f19m82nnu.apps.googleusercontent.com',
     iosBundleId: 'com.skstudio.safebite',
   );
@@ -87,4 +89,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'safebite-f5e89.firebasestorage.app',
     measurementId: 'G-NQ61JYWG8J',
   );
+
 }

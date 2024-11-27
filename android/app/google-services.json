@@ -29,6 +29,13 @@
             {
               "client_id": "1004401762155-0e9t4ckmkjm3u773n9ri2785o1vrkmiq.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1004401762155-sct89f2i4o5268nbpukg7l8f19m82nnu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.skstudio.safebite"
+              }
             }
           ]
         }
@@ -42,6 +49,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1004401762155-olnfv09rr0q09cnmbboqv55htk58894m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.skstudio.safebite",
+            "certificate_hash": "71073753469b63d54f22d1197a499026a30f278f"
+          }
+        },
         {
           "client_id": "1004401762155-0e9t4ckmkjm3u773n9ri2785o1vrkmiq.apps.googleusercontent.com",
           "client_type": 3
@@ -58,6 +73,13 @@
             {
               "client_id": "1004401762155-0e9t4ckmkjm3u773n9ri2785o1vrkmiq.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1004401762155-sct89f2i4o5268nbpukg7l8f19m82nnu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.skstudio.safebite"
+              }
             }
           ]
         }
