@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:safebite/src/views/profile_screen.dart';
 import 'package:safebite/src/views/scanner_screen.dart';
-
 import 'views/home_screen.dart';
 import 'views/login_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,9 +17,7 @@ class App extends StatelessWidget {
         primaryColor: Colors.blue,
         colorScheme: const ColorScheme.light(primary: Colors.blue),
         textTheme: Theme.of(context).textTheme.apply(
-          // Note: The below line is required due to a current bug in Flutter:
-          // https://github.com/flutter/flutter/issues/129553
-            decorationColor: Colors.green),
+            decorationColor: Colors.green), // Ajuste para bug en Flutter
         inputDecorationTheme: const InputDecorationTheme(
           prefixIconColor: Colors.black54,
           suffixIconColor: Colors.black54,
@@ -27,17 +25,27 @@ class App extends StatelessWidget {
           labelStyle: TextStyle(color: Colors.black54),
           hintStyle: TextStyle(color: Colors.black54),
         ),
-        // primaryColor: Colors.green,
-        // colorScheme: const ColorScheme.light(primary: Colors.lightGreen),
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
+      initialRoute: FirebaseAuth.instance.currentUser == null ? '/login' : '/home',
       routes: {
         '/login': (BuildContext context) => const LoginScreen(),
-        '/home': (BuildContext context) => const HomeScreen(),
-        '/profile': (BuildContext context) => const ProfileScreen(),
-        '/scanner': (BuildContext context) => const ScannerScreen()
+        '/home': (BuildContext context) {
+          final currentUser = FirebaseAuth.instance.currentUser;
+          if (currentUser == null) {
+            return const LoginScreen(); // Redirige si no está autenticado
+          }
+          return HomeScreen(userUid: currentUser.uid); // Pasa el `userUid`
+        },
+        '/profile': (BuildContext context) {
+          final currentUser = FirebaseAuth.instance.currentUser;
+          if (currentUser == null) {
+            return const LoginScreen(); // Redirige si no está autenticado
+          }
+          return ProfileScreen(userUid: currentUser.uid); // Pasa el `userUid`
+        },
+        '/scanner': (BuildContext context) => const ScannerScreen(),
       },
     );
   }

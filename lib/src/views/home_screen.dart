@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'profile_screen.dart';
 import 'scanner_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/user_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String userUid;
+
+  const HomeScreen({super.key, required this.userUid});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final UserService _userService;
   String result = '';
   String userName = '';
   String? photoUrl;
@@ -19,27 +24,32 @@ class _HomeScreenState extends State<HomeScreen> {
   double dailySugar = 0;
   double dailySodium = 0;
 
-
   @override
   void initState() {
     super.initState();
-    _loadUsername();
+    _userService = UserService(context);
     _loadUserProfile();
     _loadDailyProgress(); // Cargar el progreso del día
   }
 
-  Future<void> _loadUsername() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userName = prefs.getString('username') ?? 'Usuario';
-    });
-  }
-
   void _loadUserProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      photoUrl = prefs.getString('photoUrl') ?? 'https://via.placeholder.com/150';
-    });
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      setState(() {
+        userName = currentUser.displayName ?? 'Usuario';
+        photoUrl = currentUser.photoURL ?? 'https://via.placeholder.com/150';  // Foto de perfil por defecto
+      });
+
+      // Si el nombre del usuario es "Usuario", lo actualizamos con los datos adicionales de la base de datos.
+      if (userName == 'Usuario') {
+        final userData = await _userService.getUserData(currentUser.uid);
+        setState(() {
+          userName = userData?['name'] ?? 'Usuario';
+          photoUrl = userData?['photoUrl'] ?? 'https://via.placeholder.com/150'; // Cargar foto de perfil desde los datos de usuario
+        });
+      }
+    }
   }
 
   Future<void> _loadDailyProgress() async {
@@ -117,15 +127,17 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // Foto de perfil existente
+          // IconButton para mostrar la foto de perfil en la esquina y navegar a la pantalla de perfil
           IconButton(
             icon: CircleAvatar(
-              backgroundImage: AssetImage('assets/images/Perfil_placeholder.jpg'),
+              backgroundImage: NetworkImage(photoUrl ?? 'https://via.placeholder.com/150'), // Aquí usamos la URL de foto o la por defecto
             ),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(userUid: FirebaseAuth.instance.currentUser!.uid),
+                ),
               );
             },
           ),
@@ -143,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
             // Mensaje de bienvenida centrado
             Text(
-              'Bienvenido/a $userName, ¿qué vamos a comer hoy?',
+              '¡Hola $userName! ¿qué vamos a comer hoy?',
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -256,5 +268,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-

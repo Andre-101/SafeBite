@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';  // Asegúrate de importar el modelo de usuario
+import '../services/user_service.dart';  // Asegúrate de importar el servicio de usuario
 
 class EditDietPreferencesScreen extends StatefulWidget {
   const EditDietPreferencesScreen({super.key});
@@ -28,15 +30,27 @@ class _EditDietPreferencesScreenState extends State<EditDietPreferencesScreen> {
     super.initState();
     // Inicializamos los valores de los checkboxes a false (no seleccionados)
     _selectedDiets = {for (var diet in _diets) diet: false};
-  }
 
-  @override
-  void dispose() {
-    super.dispose();
+    // Recuperar la dieta preferida actual del usuario
+    // Asumimos que el `UserModel.instance.diet` es un String o una lista de dietas
+    if (UserModel.instance.diet != null) {
+      // Si la dieta es un solo valor, lo marcamos como seleccionado
+      if (_diets.contains(UserModel.instance.diet)) {
+        _selectedDiets[UserModel.instance.diet!] = true;
+      }
+      // Si la dieta es una lista (en el caso de dietas múltiples), marcamos las opciones correspondientes
+      else if (UserModel.instance.diet is List<String>) {
+        for (var diet in UserModel.instance.diet as List<String>) {
+          _selectedDiets[diet] = true;
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final UserService userService = UserService(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Preferencias de Dieta'),
@@ -64,7 +78,7 @@ class _EditDietPreferencesScreenState extends State<EditDietPreferencesScreen> {
                 children: _diets.map((diet) {
                   return CheckboxListTile(
                     title: Text(diet),
-                    value: _selectedDiets[diet],
+                    value: _selectedDiets[diet] ?? false,
                     onChanged: (bool? value) {
                       setState(() {
                         _selectedDiets[diet] = value!;
@@ -81,13 +95,34 @@ class _EditDietPreferencesScreenState extends State<EditDietPreferencesScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Aquí puedes agregar la lógica para guardar las preferencias dietéticas
-                  // Por ejemplo, en SharedPreferences o en una base de datos
+                  // Recoger la primera dieta seleccionada
+                  String? selectedDiet = _diets.firstWhere(
+                          (diet) => _selectedDiets[diet] == true,
+                      orElse: () => ''
+                  );  // Obtener la primera dieta seleccionada
+
+                  // Actualizar el modelo de usuario
+                  UserModel.update(
+                    uid: UserModel.instance.uid,
+                    email: UserModel.instance.email,
+                    name: UserModel.instance.name,
+                    photoUrl: UserModel.instance.photoUrl,
+                    sex: UserModel.instance.sex,
+                    weight: UserModel.instance.weight,
+                    height: UserModel.instance.height,
+                    diet: selectedDiet.isEmpty ? null : selectedDiet,  // Solo guardar una dieta
+                  );
+
+                  // Guardar los datos en Firebase o cualquier otro servicio
+                  userService.saveUser(UserModel.instance);
 
                   // Mostrar mensaje de confirmación
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Preferencias de dieta guardadas')),
                   );
+
+                  // Navegar a la pantalla anterior o home
+                  Navigator.pop(context);
                 },
                 child: const Text('Guardar'),
               ),

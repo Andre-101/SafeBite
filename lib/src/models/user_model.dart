@@ -3,12 +3,20 @@ class UserModel {
   final String email;
   final String name;
   final String photoUrl;
+  String? sex;
+  double? weight;
+  double? height;
+  String? diet;
 
   UserModel._({
     required this.uid,
     required this.email,
     required this.name,
     this.photoUrl = '',
+    this.sex,
+    this.weight,
+    this.height,
+    this.diet,
   });
 
   static UserModel? _instance;
@@ -25,6 +33,10 @@ class UserModel {
     required String email,
     required String name,
     String photoUrl = '',
+    String? sex,
+    double? weight,
+    double? height,
+    String? diet,
   }) {
     if (_instance == null) {
       _instance = UserModel._(
@@ -32,6 +44,10 @@ class UserModel {
         email: email,
         name: name,
         photoUrl: photoUrl,
+        sex: sex,
+        weight: weight,
+        height: height,
+        diet: diet,
       );
     } else {
       throw Exception("UserModel ya ha sido inicializado.");
@@ -43,12 +59,20 @@ class UserModel {
     required String email,
     required String name,
     String photoUrl = '',
+    String? sex,
+    double? weight,
+    double? height,
+    String? diet,
   }) {
     _instance = UserModel._(
       uid: uid,
       email: email,
       name: name,
       photoUrl: photoUrl,
+      sex: sex,
+      weight: weight,
+      height: height,
+      diet: diet,
     );
   }
 
@@ -62,6 +86,10 @@ class UserModel {
       email: map['email'] ?? '',
       name: map['name'] ?? '',
       photoUrl: map['photoUrl'] ?? '',
+      sex: map['sex'],
+      weight: map['weight'],
+      height: map['height'],
+      diet: map['diet'],
     );
   }
 
@@ -71,6 +99,10 @@ class UserModel {
       'email': email,
       'name': name,
       'photoUrl': photoUrl,
+      'sex': sex,
+      'weight': weight,
+      'height': height,
+      'diet': diet,
     };
   }
 
@@ -80,6 +112,10 @@ class UserModel {
       email: json['email'] ?? '',
       name: json['name'] ?? '',
       photoUrl: json['photoUrl'] ?? '',
+      sex: json['sex'],
+      weight: json['weight'],
+      height: json['height'],
+      diet: json['diet'],
     );
   }
 
@@ -89,6 +125,10 @@ class UserModel {
       'email': email,
       'name': name,
       'photoUrl': photoUrl,
+      'sex': sex,
+      'weight': weight,
+      'height': height,
+      'diet': diet,
     };
   }
 }

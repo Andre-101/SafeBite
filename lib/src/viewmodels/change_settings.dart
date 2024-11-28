@@ -1,12 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../services/authentication_service.dart';  // Asegúrate de que el path sea correcto.
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authService = AuthenticationService(context);  // Usamos el AuthenticationService.
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configuración'),
@@ -28,15 +31,19 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Cerrar sesión'),
               trailing: const Icon(Icons.logout),
               onTap: () async {
-                // Cerrar sesión con Google
-                final GoogleSignIn googleSignIn = GoogleSignIn();
-                await googleSignIn.signOut();
-                
-                // Limpiar preferencias locales
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.remove('username');
-                // Redirigir al login
-                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                try {
+                  print('Intentando cerrar sesión...');  // Mensaje de intento de cierre de sesión
+                  // Llamada al método signOut del AuthenticationService
+                  await FirebaseAuth.instance.signOut();
+                  await GoogleSignIn().signOut();  // Ignora el ID de Google
+
+                  // Redirigir al login
+                  Navigator.pushReplacementNamed(context, '/login');
+                } catch (e) {
+                  // Si ocurre un error, solo redirigimos al login
+                  print('Error al cerrar sesión: $e');
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
               },
             ),
 
@@ -61,16 +68,22 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: () async {
-                            // Lógica para eliminar la cuenta (puedes implementar esto según tu backend o necesidades)
-                            // En este ejemplo, solo eliminamos las preferencias locales
-                            final prefs = await SharedPreferences.getInstance();
-                            await prefs.clear();  // Elimina todos los datos guardados
-                            
-                            // Cerrar sesión y redirigir al login
-                            final GoogleSignIn googleSignIn = GoogleSignIn();
-                            await googleSignIn.signOut();
-                            
-                            Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                            try {
+                              final user = FirebaseAuth.instance.currentUser;
+                              if (user != null) {
+                                await user.delete(); // Eliminar cuenta
+                              }
+
+                              // Cerrar sesión y redirigir al login
+                              await FirebaseAuth.instance.signOut();
+                              await GoogleSignIn().signOut();  // Ignorar el ID de Google
+                              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                            } catch (e) {
+                              // Manejar error si ocurre al eliminar cuenta
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error al eliminar cuenta: $e')),
+                              );
+                            }
                           },
                           child: const Text('Eliminar'),
                         ),

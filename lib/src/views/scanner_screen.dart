@@ -92,7 +92,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
       Navigator.pop(context, {
         'calories': productInfo['calories'],
         'sugar': productInfo['sugar'],
-        'sodium': productInfo['sodium']
+        'sodium': productInfo['sodium'],
+        'name': productInfo['name'],  // Nombre
+        'image': productInfo['image'], // Imagen
+        'volume': productInfo['volume'], // Volumen
       });
     } else {
       setState(() {
@@ -117,6 +120,51 @@ class _ScannerScreenState extends State<ScannerScreen> {
       }
     } catch (e) {
       print('Error al escanear desde galería: $e');
+    }
+  }
+
+  Future<void> buscarProducto(String codigoBarras) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    try {
+      // Verificar en Firebase primero
+      DocumentSnapshot productoFirebase = await firestore
+          .collection('products')
+          .doc(codigoBarras)
+          .get();
+
+      if (productoFirebase.exists) {
+        // Si el producto existe en Firebase
+        Map<String, dynamic>? datosProducto =
+        productoFirebase.data() as Map<String, dynamic>?;
+      }
+
+      // Si no se encuentra en Firebase, buscar en FoodFacts
+      print("Producto no encontrado en Firebase. Consultando FoodFacts...");
+      final respuesta = await http.get(
+          Uri.parse('https://world.openfoodfacts.org/api/v0/product/$codigoBarras.json'));
+
+      if (respuesta.statusCode == 200) {
+        final Map<String, dynamic> datosAPI = json.decode(respuesta.body);
+        if (datosAPI['status'] == 1) {
+          final producto = datosAPI['product'];
+          print("Producto encontrado en FoodFacts:");
+          print("Nombre: ${producto['product_name'] ?? 'Nombre no disponible'}");
+          print("Peso/Volumen: ${producto['quantity'] ?? 'Información no disponible'}");
+
+          // Guardar el producto en Firebase para futuras búsquedas
+          await firestore.collection('products').doc(codigoBarras).set({
+            'name': producto['product_name'],
+            'volume': producto['quantity'],
+          });
+        } else {
+          print("El producto no existe en FoodFacts.");
+        }
+      } else {
+        print("Error al consultar FoodFacts: ${respuesta.statusCode}");
+      }
+    } catch (e) {
+      print("Error al buscar el producto: $e");
     }
   }
 

@@ -4,53 +4,67 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../viewmodels/change_diet.dart';
 import '../viewmodels/change_health.dart';
 import '../viewmodels/change_settings.dart';
+import '../services/user_service.dart';
 
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String userUid;
+
+  const ProfileScreen({super.key, required this.userUid});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String username = 'Usuario';
-  // String photoUrl = 'https://via.placeholder.com/150';
-  String gender = '♂';
-  String height = 'No definido';
-  String weight = 'No definido';
+  late final UserService _userService;
+  Map<String, dynamic>? userData;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadProfileData();
+    _userService = UserService(context);
+    _fetchUserData();
   }
 
-  Future<void> _loadProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      username = prefs.getString('username') ?? 'Usuario';
-      // photoUrl = prefs.getString('photoUrl') ?? 'https://via.placeholder.com/150';
-      gender = prefs.getString('gender') ?? '♂';
-      height = prefs.getString('height') ?? 'No definido';
-      weight = prefs.getString('weight') ?? 'No definido';
-    });
+  Future<void> _fetchUserData() async {
+    try {
+      final data = await _userService.getUserData(widget.userUid);
+      if (data != null) {
+        setState(() {
+          userData = data;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se encontró información del usuario.')),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar los datos del usuario: $e')),
+      );
+    }
   }
 
-  Future<void> _updateProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('height', height);
-    await prefs.setString('weight', weight);
-    setState(() {});
-  }
-
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tu Perfil'),
       ),
-      body: Padding(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : userData == null
+          ? const Center(child: Text('No se pudo cargar la información del usuario.'))
+          : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,39 +72,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Foto de perfil
             Center(
               child: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/Perfil_placeholder.jpg'), // Ruta de tu placeholder
+                backgroundImage: NetworkImage(userData?['photoUrl'] ?? 'https://via.placeholder.com/150'),
                 radius: 50,
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Nombre de usuario y género
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  username,
+                  userData?['name'] ?? 'Usuario',
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  gender,
-                  style: const TextStyle(fontSize: 24),
+                Icon(
+                  userData?['sex'] == 'Femenino' ? Icons.female : Icons.male,
+                  size: 24,
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            
+
             // Datos de altura y peso
-            Text('Altura: $height cm', style: const TextStyle(fontSize: 18)),
+            Text('Altura: ${userData?['height'] ?? 'No definido'} cm', style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 10),
-            Text('Peso: $weight kg', style: const TextStyle(fontSize: 18)),
+            Text('Peso: ${userData?['weight'] ?? 'No definido'} kg', style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 10),
+
+            // Mostrar dieta
+            Text('Dieta: ${userData?['diet'] ?? 'No definida'}', style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 20),
-            
-            // Links para navegar a otras pantallas
+
+            // Botones para cambiar información
             TextButton(
               onPressed: () {
-                // Navegar a la pantalla de editar información de salud (si ya está definida)
+                // Navegar a la pantalla de editar información de salud
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const EditHealthInfoScreen()));
               },
               child: const Text(
@@ -98,9 +116,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(fontSize: 16, color: Colors.blue),
               ),
             ),
+            const Divider(),
             TextButton(
               onPressed: () {
-                // Navegar a la pantalla de editar preferencias de dieta (si ya está definida)
+                // Navegar a la pantalla de editar preferencias de dieta
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const EditDietPreferencesScreen()));
               },
               child: const Text(
@@ -108,9 +127,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(fontSize: 16, color: Colors.blue),
               ),
             ),
+            const Divider(),
             TextButton(
               onPressed: () {
-                // Navegar a la pantalla de configuración (si ya está definida)
+                // Navegar a la pantalla de configuración
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
               },
               child: const Text(
